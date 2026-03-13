@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "0FyP6N1ayDs=",
+  "success": true,
+  "projectFilePath": "C:\\Ticket System\\src\\TicketSystem\\TicketSystem.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\ahmad\\.nuget\\packages\\microsoft.aspnetcore.openapi\\9.0.11\\microsoft.aspnetcore.openapi.9.0.11.nupkg.sha512",
+    "C:\\Users\\ahmad\\.nuget\\packages\\microsoft.openapi\\1.6.17\\microsoft.openapi.1.6.17.nupkg.sha512"
+  ],
+  "logs": []
+}
