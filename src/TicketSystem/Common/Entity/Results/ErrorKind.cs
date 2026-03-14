@@ -1,4 +1,4 @@
-namespace TicketSystem.Common.Entity.Result;
+namespace TicketSystem.Common.Entity.Results;
 
 public enum ErrorKind
 {

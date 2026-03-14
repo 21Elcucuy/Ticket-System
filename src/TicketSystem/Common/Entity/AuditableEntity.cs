@@ -1,11 +1,16 @@
 namespace TicketSystem.Common.Entity;
 
-public sealed class AuditableEntity :Entity
+public class AuditableEntity :Entity
 {
     public DateTime CreatedAtUtc{get; set;}
     public DateTime LastModifiedAtUtc {get; set;}
-    public string CreatedBy {get; set;} = string.Empty;
+    public int CreatedBy {get; set;} 
     
-    
+    public AuditableEntity(int Id)
+    {
+        CreatedAtUtc = DateTime.UtcNow;
+        LastModifiedAtUtc = DateTime.UtcNow;
+        CreatedBy = Id;
+    }
     
 }

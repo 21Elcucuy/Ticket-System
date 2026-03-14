@@ -1,7 +1,7 @@
 using System.Data;
 using System.Runtime.CompilerServices;
 
-namespace TicketSystem.Common.Entity.Result;
+namespace TicketSystem.Common.Entity.Results;
 
 public class Result
 {
@@ -15,7 +15,7 @@ public class Result
 public class Result <TValue>
 {
    private TValue? _value  ; 
-   private readonly List<Error> _errors;
+   private readonly List<Error> _errors = [];
    public bool IsSuccess {get;} =false;
     
     private Result(Error error)
