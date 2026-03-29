@@ -17,6 +17,7 @@ public class Result <TValue>
    private TValue? _value  ; 
    private readonly List<Error> _errors = [];
    public bool IsSuccess {get;} =false;
+  
     
     private Result(Error error)
     {
@@ -38,6 +39,15 @@ public class Result <TValue>
         _value = value;
         IsSuccess =true;
     }
+
+    public bool IsError => !IsSuccess;
+
+    public List<Error> Errors => IsError ? _errors! : [];
+
+    public TValue Value => IsSuccess ? _value! : default!;
+
+
+
     public static implicit operator Result<TValue>(TValue value)=> new(value);
     public static implicit operator Result<TValue>(Error error)=> new(error);
     public static implicit operator Result<TValue>(List<Error> errors)=> new(errors);

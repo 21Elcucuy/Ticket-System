@@ -2,8 +2,15 @@ namespace TicketSystem.Common.Entity;
 
 public class Entity
 {
-    public long Id {get; set;}
+    // public int Id {get; set;}
     
-    
+    protected Entity()
+    {
+        
+    }
+    protected Entity(int id )
+    {
+        // Id = id ;
+    }
 
 }
