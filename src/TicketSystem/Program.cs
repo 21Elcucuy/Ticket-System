@@ -11,6 +11,7 @@ using Wolverine.Http;
 using Wolverine.Http.Transport;
 using Wolverine.FluentValidation;
 using Wolverine.Http.FluentValidation;
+using TicketSystem.Infrastructure.ExceptionMiddleware;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
@@ -67,7 +68,6 @@ builder.Services.Configure<IdentityOptions>(options =>
 
 
 
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -78,6 +78,10 @@ builder.Services.AddWolverine(op =>
     
 });
 
+
+
+
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -87,10 +91,13 @@ if (app.Environment.IsDevelopment())
 }
 
 
+app.UseMiddleware<GlobalExceptionMiddleware>();
+
 app.UseHttpsRedirection();
 
+
 app.UseAuthentication();
-app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapWolverineEndpoints(opts =>
 {

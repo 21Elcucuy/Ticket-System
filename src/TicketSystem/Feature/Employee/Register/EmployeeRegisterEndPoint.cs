@@ -89,10 +89,8 @@ public class EmployeeRegisterEndPoint(AppDbContext context , UserManager<AppUser
              user.PasswordHash = userManager.PasswordHasher.HashPassword(user , command.Password);
              user.NormalizedUserName = user.UserName.ToUpper();
              user.NormalizedEmail = user.Email.ToUpper();
-            using(var transaction = context.Database.BeginTransaction())
-             {
-            try
-            {
+            using var transaction = context.Database.BeginTransaction();
+            
                 
             var ResultUser = context.Users.Add(user);
             await context.SaveChangesAsync(ct);   
@@ -110,18 +108,9 @@ public class EmployeeRegisterEndPoint(AppDbContext context , UserManager<AppUser
         
             await transaction.CommitAsync(ct);
            return TypedResults.Created();
-            }
-            catch
-            {
-                transaction.Rollback();
-
-               return TypedResults.Problem(
-                    statusCode : StatusCodes.Status500InternalServerError,
-                    title:"Something Went Wrong",
-                    detail: "Employee Register EndPoint Is Not Succeeded"
-                );
-            } 
+            
+       
         }
         }
-    }
+    
 
