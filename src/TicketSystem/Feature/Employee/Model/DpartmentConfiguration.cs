@@ -10,5 +10,7 @@ public sealed class DepartmentConfiguration : IEntityTypeConfiguration<Departmen
         builder.HasKey(x=> x.DepartmentId);
 
         builder.Property(x => x.Name).IsRequired();
+
+         builder.HasMany(x => x.Employee).WithOne(x => x.Department).HasForeignKey(x => x.DepartmentId).OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -12,7 +12,7 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<EmployeeProfile>
         
         builder.HasOne(x => x.AppUser).WithOne(x => x.Employee).HasForeignKey<EmployeeProfile>(x => x.EmployeeId).OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne(x => x.Department).WithOne(x => x.Employee).HasForeignKey<EmployeeProfile>(x => x.DepartmentId).OnDelete(DeleteBehavior.Cascade);
+       
     
        builder.Property(x => x.Salary).IsRequired();
     }

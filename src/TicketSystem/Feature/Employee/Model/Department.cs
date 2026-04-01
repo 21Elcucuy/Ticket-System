@@ -7,5 +7,5 @@ public class Department : AuditableEntity
     public int DepartmentId { get; set; }
     public string? Name {get ; set;}
 
-    public virtual EmployeeProfile? Employee {get ; set ;}
+    public virtual List<EmployeeProfile>? Employee {get ; set ;}
 }

@@ -2,6 +2,7 @@ using System.Security.Claims;
 using FluentValidation;
 using ImTools;
 using JasperFx.Events.Daemon;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
@@ -29,19 +30,21 @@ public class EmployeeRegisterCommandValidator : AbstractValidator<EmployeeRegist
         RuleFor(x => x.UserName).NotNull().WithMessage("UserName Is Required");
         RuleFor(x => x.FirstName).NotNull().WithMessage("FirstName  Is Required");
         RuleFor(x => x.LastName).NotNull().WithMessage("LastName  Is Required");
-        RuleFor(x => x.Password).NotNull().WithMessage("Password  Is Required");
+        RuleFor(x => x.Password).NotNull().WithMessage("Password  Is Required").MinimumLength(6);
         RuleFor(x => x.DepartmentId).NotNull().WithMessage("DepartmentId is Required");
         RuleFor(x => x.PhoneNumber).Matches( @"\(?\d{3}\)?-? *\d{3}-? *-?\d{4}");
         RuleFor(x => x.Salary).NotNull();
     }
 }
 
-// [Authorize(policy : "CanRegisterEmployee")]
 [Tags("EmployeeRegister")]
+// [Authorize(policy : "CanRegisterEmployee")]
+   
 public class EmployeeRegisterEndPoint(AppDbContext context , UserManager<AppUser> userManager)
 {
     private readonly AppDbContext context = context;
     private readonly UserManager<AppUser> userManager = userManager;
+   
 
     public   async Task<ProblemDetails> ValidateAsync(EmployeeRegisterCommand command , CancellationToken ct)
     {
@@ -74,7 +77,9 @@ public class EmployeeRegisterEndPoint(AppDbContext context , UserManager<AppUser
         }
          return WolverineContinue.NoProblems;
     }
+     
         [WolverinePost("/api/Employee-Register")]
+        [Authorize(Roles = "Staff")]
          public async Task<Results<Created, ProblemHttpResult>> Handle(EmployeeRegisterCommand command , CancellationToken ct)
          {
             var user = new AppUser

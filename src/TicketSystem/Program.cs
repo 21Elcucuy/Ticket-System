@@ -1,70 +1,22 @@
-using System;
-using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
-using TicketSystem.Application.Auth;
-using TicketSystem.Common.Model;
-using TicketSystem.Infrastructure.Persistence;
 using Wolverine;
 using Wolverine.Http;
 using Wolverine.Http.Transport;
 using Wolverine.FluentValidation;
 using Wolverine.Http.FluentValidation;
 using TicketSystem.Infrastructure.ExceptionMiddleware;
+using FluentValidation;
+using TicketSystem.Infrastructure;
+using Microsoft.AspNetCore.Http.Features;
+using System.IdentityModel.Tokens.Jwt;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
 
 
-builder.Services.AddSqlite<AppDbContext>("Data Source =AppDb.db");
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+builder.Services.AddInfrastructure(builder.Configuration);
 
-builder.Services.AddScoped<TokenProvider>();
-builder.Services.AddScoped<AppDbContext>();
-
-
-
-
-
-builder.Services.AddAuthentication(op =>
-{
-    op.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    op.DefaultChallengeScheme  = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(op =>
-{
-  op.TokenValidationParameters = new TokenValidationParameters
-  {
-      ValidateIssuer = true,
-      ValidateAudience =true,
-      ValidateLifetime = true, 
-      ValidateIssuerSigningKey = true,
-      ValidIssuer = builder.Configuration["Jwt:Issuer"],
-      ValidAudience =builder.Configuration["Jwt:Audience"],
-      IssuerSigningKey =new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
-
-  }  ;
-});
-
-builder.Services.Configure<IdentityOptions>(options =>
-{
-    
-    options.Password.RequireDigit = true;
-    options.Password.RequireLowercase = true;
-    options.Password.RequireNonAlphanumeric = true;
-    options.Password.RequireUppercase = true;
-    options.Password.RequiredLength = 6;
-    options.Password.RequiredUniqueChars = 1;
-}).AddIdentity<AppUser , IdentityRole<int>>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
-// builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<AppDbContext>()
-// .AddDefaultTokenProviders();
-
-
-builder.Services.Configure<IdentityOptions>(options =>
-{
-    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-    options.Lockout.MaxFailedAccessAttempts = 5;
-    options.Lockout.AllowedForNewUsers = true;
-});
 
 
 
@@ -75,10 +27,20 @@ builder.Services.AddWolverineHttp();
 builder.Services.AddWolverine(op =>
 {
     op.UseFluentValidation();
-    
+   
 });
 
-
+builder.Services.AddProblemDetails(op =>
+{
+    op.CustomizeProblemDetails = context =>
+    {
+        context.ProblemDetails.Instance = $"{context.HttpContext.Request.Method} {context.HttpContext.Request.Path}";
+        context.ProblemDetails.Extensions.TryAdd("requestId" ,context.HttpContext.TraceIdentifier);
+        var activity = context.HttpContext.Features.Get<IHttpActivityFeature>()?.Activity;
+        context.ProblemDetails.Extensions.TryAdd("traceId",activity?.Id);
+    };
+});
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 
 
@@ -86,13 +48,15 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
+    app.UseDeveloperExceptionPage();
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
 
-app.UseMiddleware<GlobalExceptionMiddleware>();
+app.UseExceptionHandler();
 
+app.UseRouting();
 app.UseHttpsRedirection();
 
 
@@ -101,7 +65,10 @@ app.UseAuthorization();
 
 app.MapWolverineEndpoints(opts =>
 {
+    opts.WarmUpRoutes = RouteWarmup.Eager;
      opts.UseFluentValidationProblemDetailMiddleware();
+     opts.RequireAuthorizeOnAll();
+     
 });
  app.MapWolverineHttpTransportEndpoints();
 app.Run();

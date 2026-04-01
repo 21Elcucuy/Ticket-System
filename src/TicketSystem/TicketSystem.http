@@ -4,3 +4,17 @@ GET {{TicketSystem_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+POST  http://localhost:5297/api/Employee-Register
+content-type: application/json; charset=utf-8 
+Authorization: Bearer "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZW1haWwiOiJEYW1uMjEyMzk0MUBnbWFpbC5jb20iLCJyb2xlIjoiU3RhZmYiLCJuYmYiOjE3NzQ5MzQzOTksImV4cCI6MTc3NDkzNTI5OSwiaWF0IjoxNzc0OTM0Mzk5LCJpc3MiOiJodHRwczovL215YXBpLmNvbSIsImF1ZCI6Imh0dHBzOi8vbXlhcHAtZnJvbnRlbmQuY29tIn0.Cl_pYhxG_mr-uK3FezP8lLMEThE6A7TZCNr7MRd8Dfs"
+
+{
+  "email": "gingo505@gmail.com",
+  "userName": "adsoo",
+  "departmentId": 1,
+  "firstName": "adisso",
+  "lastName": "maniko",
+  "password": "22DamnMan@",
+  "phoneNumber": "0781234211",
+  "salary": 1000
+}
