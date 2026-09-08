@@ -12,6 +12,7 @@ using TicketSystem.Common.Interface;
 using TicketSystem.Common.Model;
 using TicketSystem.Feature.Auth.Register;
 using TicketSystem.Infrastructure.Persistence;
+using TicketSystem.Infrastructure.Services;
 using Wolverine;
 
 namespace TicketSystem.Infrastructure;
@@ -25,6 +26,7 @@ public static class DependencyInjection
         Services.AddSqlite<AppDbContext>("Data Source =AppDb.db");
         Services.AddScoped<AppDbContext>();
         Services.AddScoped<ITokenProvider,TokenProvider>();
+        Services.AddScoped<IEmailSerivces , EmailServices>();
         Services.AddAuthentication(op =>
         {
            op.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

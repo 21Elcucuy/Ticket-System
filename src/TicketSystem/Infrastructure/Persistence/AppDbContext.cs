@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using TicketSystem.Common.Model;
 using TicketSystem.Feature.Auth.Model;
 using TicketSystem.Feature.Employee.Model;
+using TicketSystem.Feature.Ticket.Model;
 
 
 
@@ -23,7 +24,7 @@ public sealed class AppDbContext(IHttpContextAccessor httpContextAccessor ,DbCon
     public DbSet<EmployeeProfile> Employees => Set<EmployeeProfile>();
     public DbSet<Department> Departments => Set<Department>();
 
-
+    public DbSet<TicketProfile> Tickets => Set<TicketProfile>();
 
 
 
@@ -84,7 +85,7 @@ public sealed class AppDbContext(IHttpContextAccessor httpContextAccessor ,DbCon
         // if(userId is null)
         // {
         //     throw new NullReferenceException();
-        // }
+        // }           //  error Object reference not set to an instance of an object. try to catch it later
        foreach(var entries in ChangeTracker.Entries<IAuditableEntity>())
         {
             switch(entries.State)

@@ -15,7 +15,7 @@ namespace TicketSystem.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "9.0.14");
+            modelBuilder.HasAnnotation("ProductVersion", "9.0.19");
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>
                 {
@@ -339,6 +339,52 @@ namespace TicketSystem.Migrations
                     b.ToTable("Employees");
                 });
 
+            modelBuilder.Entity("TicketSystem.Feature.Ticket.Model.TicketProfile", b =>
+                {
+                    b.Property<int>("TicketId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("FromEmail")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("LastModifiedAtUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("LastModifiedBy")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("TicketStatus")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("TicketSubject")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("TicketId");
+
+                    b.HasIndex("EmployeeId")
+                        .IsUnique();
+
+                    b.ToTable("Tickets");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<int>", null)
@@ -409,6 +455,17 @@ namespace TicketSystem.Migrations
                     b.Navigation("Department");
                 });
 
+            modelBuilder.Entity("TicketSystem.Feature.Ticket.Model.TicketProfile", b =>
+                {
+                    b.HasOne("TicketSystem.Feature.Employee.Model.EmployeeProfile", "EmployeeProfile")
+                        .WithOne("Ticket")
+                        .HasForeignKey("TicketSystem.Feature.Ticket.Model.TicketProfile", "EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EmployeeProfile");
+                });
+
             modelBuilder.Entity("TicketSystem.Common.Model.AppUser", b =>
                 {
                     b.Navigation("Employee");
@@ -417,6 +474,11 @@ namespace TicketSystem.Migrations
             modelBuilder.Entity("TicketSystem.Feature.Employee.Model.Department", b =>
                 {
                     b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("TicketSystem.Feature.Employee.Model.EmployeeProfile", b =>
+                {
+                    b.Navigation("Ticket");
                 });
 #pragma warning restore 612, 618
         }
