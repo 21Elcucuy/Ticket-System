@@ -43,7 +43,7 @@ public class UpdateTicketEndpoint(AppDbContext context , IEmailSerivces emailSer
         }
         return WolverineContinue.NoProblems;
     }
-    [WolverinePost("/api/update-ticket")]
+    [WolverinePut("/api/update-ticket")]
     [AllowAnonymous]
     public async Task<Results<NoContent , BadRequest>>Handle(UpdateTicketCommand command , CancellationToken ct  = default)
     {
@@ -61,7 +61,7 @@ public class UpdateTicketEndpoint(AppDbContext context , IEmailSerivces emailSer
         if(result.State == EntityState.Modified)
         {
             await context.SaveChangesAsync(ct);
-            await emailSerivces.SendEmailAaync(Ticket.FromEmail!,"For My nigga" , command.ResponseMessage);
+            await emailSerivces.SendEmailAaync(Ticket.FromEmail!,"Damn" , command.ResponseMessage);
           return TypedResults.NoContent();
 
         }

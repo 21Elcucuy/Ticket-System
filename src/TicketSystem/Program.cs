@@ -13,11 +13,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
 
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddInfrastructure(builder.Configuration);
-
-
 
 
 builder.Services.AddEndpointsApiExplorer();
@@ -65,7 +64,7 @@ app.UseAuthorization();
 
 app.MapWolverineEndpoints(opts =>
 {
-    opts.WarmUpRoutes = RouteWarmup.Eager;
+     opts.WarmUpRoutes = RouteWarmup.Eager;
      opts.UseFluentValidationProblemDetailMiddleware();
      opts.RequireAuthorizeOnAll();
      

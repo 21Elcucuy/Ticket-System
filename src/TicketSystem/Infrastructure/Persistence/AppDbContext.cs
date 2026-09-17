@@ -3,9 +3,12 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using TicketSystem.Common.Entity.Enum;
 using TicketSystem.Common.Model;
+using TicketSystem.Common.Model.Department;
 using TicketSystem.Feature.Auth.Model;
 using TicketSystem.Feature.Employee.Model;
+using TicketSystem.Feature.Teams.Models;
 using TicketSystem.Feature.Ticket.Model;
 
 
@@ -19,12 +22,14 @@ public sealed class AppDbContext(IHttpContextAccessor httpContextAccessor ,DbCon
     private readonly IHttpContextAccessor httpContextAccessor = httpContextAccessor;
 
     // public DbSet<AppUser> Users => Set<AppUser>();
-    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<RefreshTokenProfile> RefreshTokens => Set<RefreshTokenProfile>();
 
+    public DbSet<DepartmentProfile> Departments => Set<DepartmentProfile>();
     public DbSet<EmployeeProfile> Employees => Set<EmployeeProfile>();
-    public DbSet<Department> Departments => Set<Department>();
 
     public DbSet<TicketProfile> Tickets => Set<TicketProfile>();
+    public DbSet<TeamProfile> Team => Set<TeamProfile>();
+    
 
 
 
@@ -32,10 +37,11 @@ public sealed class AppDbContext(IHttpContextAccessor httpContextAccessor ,DbCon
     {
         base.OnModelCreating(modelBuilder);
 
-       modelBuilder.Entity<Department>().HasData(new Department
+       modelBuilder.Entity<DepartmentProfile>().HasData(new DepartmentProfile
        {
            DepartmentId =1 ,
            Name ="IT",
+           Location ="SanFra",
            CreatedAtUtc =DateTime.Parse("03/29/2026 22:49:07"),
            LastModifiedAtUtc =DateTime.Parse("03/29/2026 22:49:07"),
            IsActive =true,
@@ -43,6 +49,7 @@ public sealed class AppDbContext(IHttpContextAccessor httpContextAccessor ,DbCon
            
        });
 
+      
 
 
 

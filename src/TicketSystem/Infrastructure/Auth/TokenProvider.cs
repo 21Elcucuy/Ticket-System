@@ -45,15 +45,15 @@ public class TokenProvider(AppDbContext context , IConfiguration configuration) 
         var tokenHandler = new JwtSecurityTokenHandler();
         var SecurityToken = tokenHandler.CreateToken(descriptor);
          
-        var oldRefreshToken = context.RefreshTokens.Where(x => x.UserId == user.Id).ExecuteDeleteAsync(ct);
+        var oldRefreshToken = await context.RefreshTokens.Where(x => x.UserId == user.Id).ExecuteDeleteAsync(ct);
 
-        var refreshTokenResult = RefreshToken.Create(user.Id , DateTime.UtcNow.AddDays(7));
+        var refreshTokenResult = RefreshTokenProfile.Create(user.Id , DateTime.UtcNow.AddDays(7));
         if(refreshTokenResult.IsError)
         {
             return refreshTokenResult.Errors;
         }
         var refreshToken =refreshTokenResult.Value;
-
+        
         context.RefreshTokens.Add(refreshToken);
         
         await context.SaveChangesAsync(ct);
@@ -66,5 +66,32 @@ public class TokenProvider(AppDbContext context , IConfiguration configuration) 
         };
     }
 
-   
+    public ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
+    {
+         var JwtSettings = configuration.GetSection("JwtSettings");
+        var issuer = JwtSettings["Issuer"];
+        var audience =  JwtSettings["Audience"];
+        var key = JwtSettings["Key"];
+        var validationParams = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey         = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key!)),
+            ValidateIssuer   = true,
+            ValidIssuer      = issuer,
+            ValidateAudience = true,
+            ValidAudience    = audience,
+            ValidateLifetime = false
+        };
+
+        var handler   = new JwtSecurityTokenHandler();
+        var principal = handler.ValidateToken(token, validationParams, out var securityToken);
+
+        if (securityToken is not JwtSecurityToken jwt ||
+            !jwt.Header.Alg.Equals(
+                SecurityAlgorithms.HmacSha256,
+                StringComparison.InvariantCultureIgnoreCase))
+            return null;
+
+        return principal;
+    }
 }

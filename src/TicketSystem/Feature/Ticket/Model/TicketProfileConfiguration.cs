@@ -9,7 +9,7 @@ public class TicketProfileConfiguration : IEntityTypeConfiguration<TicketProfile
     {
         builder.HasKey(x => x.TicketId);
         
-        builder.HasOne(x => x.EmployeeProfile).WithOne(x => x.Ticket).HasForeignKey<TicketProfile>(x => x.EmployeeId).OnDelete(DeleteBehavior.Cascade); 
+        builder.HasOne(x => x.EmployeeProfile).WithOne().HasForeignKey<TicketProfile>(x => x.EmployeeId).OnDelete(DeleteBehavior.Cascade); 
         
         builder.Property(x => x.FromEmail).IsRequired();
         builder.Property(x => x.TicketSubject).IsRequired();

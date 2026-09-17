@@ -10,6 +10,7 @@ using TicketSystem.Common.Dtos;
 using TicketSystem.Common.Entity.Enum;
 using TicketSystem.Common.Interface;
 using TicketSystem.Common.Model;
+using TicketSystem.Feature.Auth.Model;
 using TicketSystem.Infrastructure.Persistence;
 using Wolverine.Http;
 
@@ -49,7 +50,7 @@ public class EmployeeLoginEndPoint(AppDbContext context , UserManager<AppUser> u
         return WolverineContinue.NoProblems;
     } 
     [WolverinePost("/api/Employee-Login")]
-    
+    [AllowAnonymous]
     public async Task<Results<Ok<TokenResponse>, ProblemHttpResult>> Handle(EmployeeLoginCommand command , CancellationToken ct)
     {
         var user = context.Users.FirstOrDefault(x => x.Email == command.Email)!;
@@ -62,6 +63,7 @@ public class EmployeeLoginEndPoint(AppDbContext context , UserManager<AppUser> u
                 detail: "Incorrect Password"
             );
         }
+        await context.SaveChangesAsync(ct);
        var tokens = await tokenProvider.GenerateAsync(user);
         if(tokens.IsError)
         {

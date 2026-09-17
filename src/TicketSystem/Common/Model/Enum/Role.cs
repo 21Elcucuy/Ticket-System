@@ -5,5 +5,5 @@ public enum Role
     Owner,
     Manager,
     Staff,
-    Customer
+    
 }

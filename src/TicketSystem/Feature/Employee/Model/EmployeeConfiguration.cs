@@ -11,9 +11,8 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<EmployeeProfile>
         builder.HasKey(x => x.EmployeeId);
         
         builder.HasOne(x => x.AppUser).WithOne(x => x.Employee).HasForeignKey<EmployeeProfile>(x => x.EmployeeId).OnDelete(DeleteBehavior.Cascade);
+         builder.HasOne(x => x.Team).WithMany().HasForeignKey(x => x.TeamId).OnDelete(DeleteBehavior.SetNull);
 
-       
-    
-       builder.Property(x => x.Salary).IsRequired();
     }
-}
+       
+    }

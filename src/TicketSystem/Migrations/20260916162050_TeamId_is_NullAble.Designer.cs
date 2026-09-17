@@ -11,8 +11,8 @@ using TicketSystem.Infrastructure.Persistence;
 namespace TicketSystem.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260829213036_TicketEntity")]
-    partial class TicketEntity
+    [Migration("20260916162050_TeamId_is_NullAble")]
+    partial class TeamId_is_NullAble
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -238,31 +238,7 @@ namespace TicketSystem.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("TicketSystem.Feature.Auth.Model.RefreshToken", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTimeOffset>("ExpiresAtUtc")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("IsRevoked")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("RefreshTokens");
-                });
-
-            modelBuilder.Entity("TicketSystem.Feature.Employee.Model.Department", b =>
+            modelBuilder.Entity("TicketSystem.Common.Model.Department.DepartmentProfile", b =>
                 {
                     b.Property<int>("DepartmentId")
                         .ValueGeneratedOnAdd()
@@ -285,6 +261,10 @@ namespace TicketSystem.Migrations
 
                     b.Property<int?>("LastModifiedBy")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -302,13 +282,95 @@ namespace TicketSystem.Migrations
                             IsActive = true,
                             IsDeleted = false,
                             LastModifiedAtUtc = new DateTime(2026, 3, 29, 22, 49, 7, 0, DateTimeKind.Unspecified),
+                            Location = "SanFra",
                             Name = "IT"
                         });
+                });
+
+            modelBuilder.Entity("TicketSystem.Feature.Auth.Model.RefreshTokenProfile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTimeOffset>("ExpiresAtUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsRevoked")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("LastModifiedAtUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("LastModifiedBy")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("TicketSystem.Feature.Employee.Model.EmployeeProfile", b =>
                 {
                     b.Property<int>("EmployeeId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("LastModifiedAtUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("LastModifiedBy")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("TeamId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("role")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("EmployeeId");
+
+                    b.HasIndex("TeamId");
+
+                    b.ToTable("Employees");
+                });
+
+            modelBuilder.Entity("TicketSystem.Feature.Teams.Models.TeamProfile", b =>
+                {
+                    b.Property<int>("TeamId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("CreatedAtUtc")
@@ -332,14 +394,20 @@ namespace TicketSystem.Migrations
                     b.Property<int?>("LastModifiedBy")
                         .HasColumnType("INTEGER");
 
-                    b.Property<double>("Salary")
-                        .HasColumnType("REAL");
+                    b.Property<int>("ManagerId")
+                        .HasColumnType("INTEGER");
 
-                    b.HasKey("EmployeeId");
+                    b.Property<string>("TeamName")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("TeamId");
 
                     b.HasIndex("DepartmentId");
 
-                    b.ToTable("Employees");
+                    b.HasIndex("ManagerId")
+                        .IsUnique();
+
+                    b.ToTable("Team");
                 });
 
             modelBuilder.Entity("TicketSystem.Feature.Ticket.Model.TicketProfile", b =>
@@ -439,29 +507,58 @@ namespace TicketSystem.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("TicketSystem.Feature.Employee.Model.EmployeeProfile", b =>
+            modelBuilder.Entity("TicketSystem.Feature.Auth.Model.RefreshTokenProfile", b =>
                 {
-                    b.HasOne("TicketSystem.Feature.Employee.Model.Department", "Department")
-                        .WithMany("Employee")
-                        .HasForeignKey("DepartmentId")
+                    b.HasOne("TicketSystem.Common.Model.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TicketSystem.Feature.Employee.Model.EmployeeProfile", b =>
+                {
                     b.HasOne("TicketSystem.Common.Model.AppUser", "AppUser")
                         .WithOne("Employee")
                         .HasForeignKey("TicketSystem.Feature.Employee.Model.EmployeeProfile", "EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("TicketSystem.Feature.Teams.Models.TeamProfile", "Team")
+                        .WithMany()
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("AppUser");
 
+                    b.Navigation("Team");
+                });
+
+            modelBuilder.Entity("TicketSystem.Feature.Teams.Models.TeamProfile", b =>
+                {
+                    b.HasOne("TicketSystem.Common.Model.Department.DepartmentProfile", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired();
+
+                    b.HasOne("TicketSystem.Feature.Employee.Model.EmployeeProfile", "Employee")
+                        .WithOne()
+                        .HasForeignKey("TicketSystem.Feature.Teams.Models.TeamProfile", "ManagerId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired();
+
                     b.Navigation("Department");
+
+                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("TicketSystem.Feature.Ticket.Model.TicketProfile", b =>
                 {
                     b.HasOne("TicketSystem.Feature.Employee.Model.EmployeeProfile", "EmployeeProfile")
-                        .WithOne("Ticket")
+                        .WithOne()
                         .HasForeignKey("TicketSystem.Feature.Ticket.Model.TicketProfile", "EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -472,16 +569,6 @@ namespace TicketSystem.Migrations
             modelBuilder.Entity("TicketSystem.Common.Model.AppUser", b =>
                 {
                     b.Navigation("Employee");
-                });
-
-            modelBuilder.Entity("TicketSystem.Feature.Employee.Model.Department", b =>
-                {
-                    b.Navigation("Employee");
-                });
-
-            modelBuilder.Entity("TicketSystem.Feature.Employee.Model.EmployeeProfile", b =>
-                {
-                    b.Navigation("Ticket");
                 });
 #pragma warning restore 612, 618
         }

@@ -20,7 +20,7 @@ using Wolverine.Http;
 namespace TicketSystem.Feature.Auth.Register;
 
 
-public record EmployeeRegisterCommand(string Email , string UserName , int DepartmentId ,string FirstName, string LastName , string Password ,string PhoneNumber,double Salary);
+public record EmployeeRegisterCommand(string Email , string UserName ,string FirstName, string LastName , string Password ,string PhoneNumber);
 
 public class EmployeeRegisterCommandValidator : AbstractValidator<EmployeeRegisterCommand>
 {
@@ -31,9 +31,9 @@ public class EmployeeRegisterCommandValidator : AbstractValidator<EmployeeRegist
         RuleFor(x => x.FirstName).NotNull().WithMessage("FirstName  Is Required");
         RuleFor(x => x.LastName).NotNull().WithMessage("LastName  Is Required");
         RuleFor(x => x.Password).NotNull().WithMessage("Password  Is Required").MinimumLength(6);
-        RuleFor(x => x.DepartmentId).NotNull().WithMessage("DepartmentId is Required");
+      
         RuleFor(x => x.PhoneNumber).Matches( @"\(?\d{3}\)?-? *\d{3}-? *-?\d{4}");
-        RuleFor(x => x.Salary).NotNull();
+  
     }
 }
 
@@ -66,20 +66,21 @@ public class EmployeeRegisterEndPoint(AppDbContext context , UserManager<AppUser
             Detail ="UserName is Used"
             };
         }
-        var IsDepartmentExist= await context.Departments.AnyAsync(x => x.DepartmentId == command.DepartmentId , ct);
-        if (!IsDepartmentExist)
-        {
-            return new  ProblemDetails{
-            Status = StatusCodes.Status404NotFound,
-            Title ="Wrong Department Id",
-            Detail ="The Department Id is not Exist"
-            };
-        }
+        // var IsTeamExist= await context.Departments.AnyAsync(x => x.DepartmentId == command.TeamId , ct);
+        // if (!IsTeamExist)
+        // {
+        //     return new  ProblemDetails{
+        //     Status = StatusCodes.Status404NotFound,
+        //     Title ="Wrong Team Id",
+        //     Detail ="The Team Id is not Exist"
+        //     };
+        // }
          return WolverineContinue.NoProblems;
     }
      
         [WolverinePost("/api/Employee-Register")]
-        [Authorize(Roles = "Staff")]
+        // [Authorize(Roles = "Staff")]
+        [AllowAnonymous]
          public async Task<Results<Created, ProblemHttpResult>> Handle(EmployeeRegisterCommand command , CancellationToken ct)
          {
             var user = new AppUser
@@ -102,9 +103,8 @@ public class EmployeeRegisterEndPoint(AppDbContext context , UserManager<AppUser
         
              var employee = new EmployeeProfile
              {
-                 DepartmentId = command.DepartmentId,
                  EmployeeId = ResultUser.Entity.Id,
-                 Salary = command.Salary
+                 
              };
         
            var addEmployeeResult =  context.Employees.Add(employee);

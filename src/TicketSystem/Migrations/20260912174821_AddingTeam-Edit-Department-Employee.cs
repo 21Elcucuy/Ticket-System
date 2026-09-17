@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace TicketSystem.Migrations
 {
     /// <inheritdoc />
-    public partial class IntitalMigration : Migration
+    public partial class AddingTeamEditDepartmentEmployee : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -68,6 +68,7 @@ namespace TicketSystem.Migrations
                     DepartmentId = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Location = table.Column<string>(type: "TEXT", nullable: false),
                     CreatedAtUtc = table.Column<DateTime>(type: "TEXT", nullable: false),
                     LastModifiedAtUtc = table.Column<DateTime>(type: "TEXT", nullable: false),
                     CreatedBy = table.Column<int>(type: "INTEGER", nullable: true),
@@ -78,22 +79,6 @@ namespace TicketSystem.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Departments", x => x.DepartmentId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "RefreshTokens",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    UserId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Token = table.Column<string>(type: "TEXT", nullable: false),
-                    ExpiresAtUtc = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
-                    IsRevoked = table.Column<bool>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RefreshTokens", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -203,12 +188,40 @@ namespace TicketSystem.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "RefreshTokens",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    UserId = table.Column<int>(type: "INTEGER", nullable: false),
+                    Token = table.Column<string>(type: "TEXT", nullable: false),
+                    ExpiresAtUtc = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
+                    IsRevoked = table.Column<bool>(type: "INTEGER", nullable: false),
+                    CreatedAtUtc = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    LastModifiedAtUtc = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<int>(type: "INTEGER", nullable: true),
+                    LastModifiedBy = table.Column<int>(type: "INTEGER", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RefreshTokens", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RefreshTokens_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Employees",
                 columns: table => new
                 {
                     EmployeeId = table.Column<int>(type: "INTEGER", nullable: false),
-                    DepartmentId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Salary = table.Column<double>(type: "REAL", nullable: false),
+                    TeamId = table.Column<int>(type: "INTEGER", nullable: false),
+                    role = table.Column<int>(type: "INTEGER", nullable: false),
                     CreatedAtUtc = table.Column<DateTime>(type: "TEXT", nullable: false),
                     LastModifiedAtUtc = table.Column<DateTime>(type: "TEXT", nullable: false),
                     CreatedBy = table.Column<int>(type: "INTEGER", nullable: true),
@@ -225,18 +238,73 @@ namespace TicketSystem.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Team",
+                columns: table => new
+                {
+                    TeamId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    ManagerId = table.Column<int>(type: "INTEGER", nullable: false),
+                    TeamName = table.Column<string>(type: "TEXT", nullable: true),
+                    DepartmentId = table.Column<int>(type: "INTEGER", nullable: false),
+                    CreatedAtUtc = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    LastModifiedAtUtc = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<int>(type: "INTEGER", nullable: true),
+                    LastModifiedBy = table.Column<int>(type: "INTEGER", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Team", x => x.TeamId);
                     table.ForeignKey(
-                        name: "FK_Employees_Departments_DepartmentId",
+                        name: "FK_Team_Departments_DepartmentId",
                         column: x => x.DepartmentId,
                         principalTable: "Departments",
                         principalColumn: "DepartmentId",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_Team_Employees_ManagerId",
+                        column: x => x.ManagerId,
+                        principalTable: "Employees",
+                        principalColumn: "EmployeeId",
+                        onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Tickets",
+                columns: table => new
+                {
+                    TicketId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    TicketStatus = table.Column<int>(type: "INTEGER", nullable: false),
+                    TicketSubject = table.Column<string>(type: "TEXT", nullable: false),
+                    FromEmail = table.Column<string>(type: "TEXT", nullable: false),
+                    EmployeeId = table.Column<int>(type: "INTEGER", nullable: false),
+                    CreatedAtUtc = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    LastModifiedAtUtc = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<int>(type: "INTEGER", nullable: true),
+                    LastModifiedBy = table.Column<int>(type: "INTEGER", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Tickets", x => x.TicketId);
+                    table.ForeignKey(
+                        name: "FK_Tickets_Employees_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalTable: "Employees",
+                        principalColumn: "EmployeeId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.InsertData(
                 table: "Departments",
-                columns: new[] { "DepartmentId", "CreatedAtUtc", "CreatedBy", "IsActive", "IsDeleted", "LastModifiedAtUtc", "LastModifiedBy", "Name" },
-                values: new object[] { 1, new DateTime(2026, 3, 29, 22, 49, 7, 0, DateTimeKind.Unspecified), null, true, false, new DateTime(2026, 3, 29, 22, 49, 7, 0, DateTimeKind.Unspecified), null, "IT" });
+                columns: new[] { "DepartmentId", "CreatedAtUtc", "CreatedBy", "IsActive", "IsDeleted", "LastModifiedAtUtc", "LastModifiedBy", "Location", "Name" },
+                values: new object[] { 1, new DateTime(2026, 3, 29, 22, 49, 7, 0, DateTimeKind.Unspecified), null, true, false, new DateTime(2026, 3, 29, 22, 49, 7, 0, DateTimeKind.Unspecified), null, "SanFra", "IT" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -276,15 +344,52 @@ namespace TicketSystem.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Employees_DepartmentId",
+                name: "IX_Employees_TeamId",
                 table: "Employees",
-                column: "DepartmentId",
+                column: "TeamId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RefreshTokens_UserId",
+                table: "RefreshTokens",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Team_DepartmentId",
+                table: "Team",
+                column: "DepartmentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Team_ManagerId",
+                table: "Team",
+                column: "ManagerId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tickets_EmployeeId",
+                table: "Tickets",
+                column: "EmployeeId",
+                unique: true);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Employees_Team_TeamId",
+                table: "Employees",
+                column: "TeamId",
+                principalTable: "Team",
+                principalColumn: "TeamId",
+                onDelete: ReferentialAction.SetNull);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_Employees_AspNetUsers_EmployeeId",
+                table: "Employees");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Employees_Team_TeamId",
+                table: "Employees");
+
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -301,10 +406,10 @@ namespace TicketSystem.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Employees");
+                name: "RefreshTokens");
 
             migrationBuilder.DropTable(
-                name: "RefreshTokens");
+                name: "Tickets");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
@@ -313,7 +418,13 @@ namespace TicketSystem.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
+                name: "Team");
+
+            migrationBuilder.DropTable(
                 name: "Departments");
+
+            migrationBuilder.DropTable(
+                name: "Employees");
         }
     }
 }
