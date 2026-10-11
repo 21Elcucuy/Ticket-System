@@ -2,7 +2,8 @@ namespace TicketSystem.Feature.Ticket.Model;
 
 public  enum TicketStatus 
 {
-    completed,
+    Unssigned,
     pending,
+    completed,
     canceled
 }

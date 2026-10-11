@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using TicketSystem.Common.Entity.Enum;
+using TicketSystem.Common.Interface;
 using TicketSystem.Common.Model;
 using TicketSystem.Common.Model.Department;
 using TicketSystem.Feature.Auth.Model;
@@ -17,9 +18,10 @@ using TicketSystem.Feature.Ticket.Model;
 
 namespace TicketSystem.Infrastructure.Persistence;
 
-public sealed class AppDbContext(IHttpContextAccessor httpContextAccessor ,DbContextOptions options ) : IdentityDbContext<AppUser , IdentityRole<int> , int> (options)
+public sealed class AppDbContext(IHttpContextAccessor httpContextAccessor ,DbContextOptions options ,ICurrentUser currentUser ) : IdentityDbContext<AppUser , IdentityRole<int> , int> (options)
 {
     private readonly IHttpContextAccessor httpContextAccessor = httpContextAccessor;
+    private readonly ICurrentUser currentUser = currentUser;
 
     // public DbSet<AppUser> Users => Set<AppUser>();
     public DbSet<RefreshTokenProfile> RefreshTokens => Set<RefreshTokenProfile>();
@@ -81,14 +83,11 @@ public sealed class AppDbContext(IHttpContextAccessor httpContextAccessor ,DbCon
     public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
     {
 
-        var user = httpContextAccessor.HttpContext?.User;
-        if(user is null)
-        {
-            throw new NullReferenceException();
-        }
-        var userIdClaim = user?.FindFirstValue(ClaimTypes.NameIdentifier);
+       
+     
+    
         
-        int ? userId = int.TryParse(userIdClaim , out var CurrrentuserId) ? CurrrentuserId : null;
+
         // if(userId is null)
         // {
         //     throw new NullReferenceException();
@@ -100,22 +99,22 @@ public sealed class AppDbContext(IHttpContextAccessor httpContextAccessor ,DbCon
                 case EntityState.Added: 
                 
                 entries.Entity.CreatedAtUtc = DateTime.UtcNow;
-                entries.Entity.CreatedBy = userId;
+                entries.Entity.CreatedBy = currentUser.UserId;
                 entries.Entity.LastModifiedAtUtc = DateTime.UtcNow;
-                entries.Entity.LastModifiedBy = userId;
+                entries.Entity.LastModifiedBy = currentUser.UserId;
                 entries.Entity.IsActive = true;
                 entries.Entity.IsDeleted = false;
                 break;
 
                 case EntityState.Modified:
                 entries.Entity.LastModifiedAtUtc = DateTime.UtcNow;
-                entries.Entity.LastModifiedBy = userId;
+                entries.Entity.LastModifiedBy = currentUser.UserId;
                  break;
                 
                 case EntityState.Deleted:
 
                 entries.Entity.LastModifiedAtUtc = DateTime.UtcNow;
-                entries.Entity.LastModifiedBy = userId;
+                entries.Entity.LastModifiedBy = currentUser.UserId;
                 entries.Entity.IsActive = false;
                 entries.Entity.IsDeleted = true;
                  break;

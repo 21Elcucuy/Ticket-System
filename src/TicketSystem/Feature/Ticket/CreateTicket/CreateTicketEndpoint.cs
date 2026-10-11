@@ -12,7 +12,7 @@ using Wolverine.Http;
 
 namespace TicketSystem.Feature.Ticket.CreateTicket;
 
-public record CreateTicketCommand(string TikcetSubject , string FromEmail , int EmployeeId) ;// The EmployeeId in the near future should remove it from command 
+public record CreateTicketCommand(string TikcetSubject , string FromEmail ) ;// The EmployeeId in the near future should remove it from command 
 
 public class CreateTikcetCommandValidator : AbstractValidator<CreateTicketCommand>
 {
@@ -27,29 +27,14 @@ public class CreateTikcetCommandValidator : AbstractValidator<CreateTicketComman
 public class CreateTicketEndpoint(AppDbContext context )
 {
     private readonly AppDbContext context = context;
-    public async Task<ProblemDetails> ValidateAsync(CreateTicketCommand command , CancellationToken ct)
-    {
-        if(! await context.Employees.AnyAsync(x => x.EmployeeId == command.EmployeeId, cancellationToken: ct))
-         {
-            return new ProblemDetails
-            {
-                Title = "Invalid Employee",
-                Status = StatusCodes.Status404NotFound,
-                Detail = "Employee Not Found" 
 
-            };
-
-         }
-         return WolverineContinue.NoProblems;
-    }
      [WolverinePost("/api/Create-Ticket")]
      [AllowAnonymous]
     public async Task<Results<Ok<CreateTicketDto> ,BadRequest>> Handle(CreateTicketCommand command , CancellationToken ct  = default)
     {
         var Ticket = new TicketProfile
         {
-            EmployeeId = command.EmployeeId,
-            TicketStatus = TicketStatus.pending,
+            TicketStatus = TicketStatus.Unssigned,
             TicketSubject = command.TikcetSubject,
             FromEmail = command.FromEmail
         };

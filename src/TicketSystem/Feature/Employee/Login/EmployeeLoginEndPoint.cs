@@ -63,6 +63,8 @@ public class EmployeeLoginEndPoint(AppDbContext context , UserManager<AppUser> u
                 detail: "Incorrect Password"
             );
         }
+        user.IsOnline = true;
+        user.LastLogin = DateTime.UtcNow;
         await context.SaveChangesAsync(ct);
        var tokens = await tokenProvider.GenerateAsync(user);
         if(tokens.IsError)

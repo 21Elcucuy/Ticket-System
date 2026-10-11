@@ -8,6 +8,9 @@ using FluentValidation;
 using TicketSystem.Infrastructure;
 using Microsoft.AspNetCore.Http.Features;
 using System.IdentityModel.Tokens.Jwt;
+using TicketSystem.Feature.Ticket.ProcessCreatedTicket;
+using TicketSystem.Common.Model.User;
+using TicketSystem.Common.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,9 +18,13 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddHttpContextAccessor();
 
+builder.Services.AddScoped<HttpCurrentUser>();
+builder.Services.AddScoped<ICurrentUser>(sp => sp.GetRequiredService<HttpCurrentUser>());
+builder.Services.AddScoped<ISystemScope>(sp => sp.GetRequiredService<HttpCurrentUser>());
+
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddInfrastructure(builder.Configuration);
-
+builder.Services.AddHostedService<ProcessCreatedTicketWorker>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

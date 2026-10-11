@@ -9,7 +9,7 @@ public  class TicketProfile : AuditableEntity
     public TicketStatus TicketStatus {get; set;}
     public string? TicketSubject {get; set;}
     public string? FromEmail {get; set;}
-    public int EmployeeId {get ; set;}
+    public int? EmployeeId {get ; set;}
     public virtual EmployeeProfile? EmployeeProfile {get; set; }
 
 }

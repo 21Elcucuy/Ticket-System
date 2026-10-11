@@ -16,7 +16,8 @@ public class AppUser : IdentityUser<int> ,IAuditableEntity
     public int? LastModifiedBy {get ;set; }
     public bool IsDeleted {get ;set;}
     public bool IsActive {get; set;}
-
+    public bool IsOnline {get;set;}
+    public DateTime LastLogin {get ;set;}
     public List<string> Roles =  [] ;
    
     public virtual EmployeeProfile? Employee {get ;set ;}

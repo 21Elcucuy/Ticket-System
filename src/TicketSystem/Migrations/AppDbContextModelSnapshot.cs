@@ -15,7 +15,7 @@ namespace TicketSystem.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "9.0.19");
+            modelBuilder.HasAnnotation("ProductVersion", "9.0.20");
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>
                 {
@@ -177,6 +177,12 @@ namespace TicketSystem.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsOnline")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("LastLogin")
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("LastModifiedAtUtc")
                         .HasColumnType("TEXT");
@@ -419,7 +425,7 @@ namespace TicketSystem.Migrations
                     b.Property<int?>("CreatedBy")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("EmployeeId")
+                    b.Property<int?>("EmployeeId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("FromEmail")
@@ -557,8 +563,7 @@ namespace TicketSystem.Migrations
                     b.HasOne("TicketSystem.Feature.Employee.Model.EmployeeProfile", "EmployeeProfile")
                         .WithOne()
                         .HasForeignKey("TicketSystem.Feature.Ticket.Model.TicketProfile", "EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("EmployeeProfile");
                 });
